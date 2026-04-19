@@ -18,7 +18,6 @@ const PORT = Number(process.env.PORT);
 const allowedOrigins = [
   process.env.CLIENT_URL,
   "https://schoolattendence-kappa.vercel.app",
-  "http://localhost:3000",
 ].filter(Boolean);
 
 app.use(
