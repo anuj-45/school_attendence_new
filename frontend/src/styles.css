@@ -39,6 +39,8 @@ a {
   border-radius: 14px;
   box-shadow: var(--shadow);
   padding: 28px;
+  display: flex;
+  flex-direction: column;
 }
 
 .login-card h2 {
@@ -48,6 +50,23 @@ a {
 .login-card p {
   color: var(--muted);
   margin: 8px 0 16px;
+}
+
+.login-footer {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.login-footer p {
+  margin: 0;
+}
+
+.login-footer strong {
+  color: var(--text);
 }
 
 .auth-mode-switch {
@@ -196,6 +215,32 @@ button:disabled {
 
 .content {
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content section {
+  flex: 1;
+}
+
+.app-footer {
+  margin-top: 40px;
+  padding: 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  border-top: 1px solid var(--border);
+  background: var(--card);
+  border-radius: 12px;
+}
+
+.app-footer p {
+  margin: 0;
+}
+
+.app-footer strong {
+  color: var(--text);
 }
 
 .navbar {

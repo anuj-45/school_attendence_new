@@ -19,6 +19,9 @@ const DashboardLayout = ({ title, children }) => {
       <main className="content">
         <Navbar title={title} user={user} />
         <section>{children}</section>
+        <footer className="app-footer">
+          <p>&copy; © 2026 School Attendance Management System. Developed by <strong>Anuj Dafure</strong>| All rights reserved.</p>
+        </footer>
       </main>
     </div>
   );
