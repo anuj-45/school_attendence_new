@@ -222,14 +222,17 @@ const getStudents = async (req, res) => {
 
 const getAdminStats = async (req, res) => {
   try {
-    const [totalStudents, totalTeachers, totalAttendance, presentCount] = await Promise.all([
+    const [totalStudents, totalTeachers, totalAttendance, presentCount, lateCount] = await Promise.all([
       Student.count(),
       User.count({ where: { role: "teacher" } }),
       Attendance.count(),
       Attendance.count({ where: { status: "Present" } }),
+      Attendance.count({ where: { status: "Late" } }),
     ]);
 
-    const attendancePercent = totalAttendance > 0 ? Number(((presentCount / totalAttendance) * 100).toFixed(2)) : 0;
+    // Late students are counted as present
+    const presentAndLateCount = presentCount + lateCount;
+    const attendancePercent = totalAttendance > 0 ? Number(((presentAndLateCount / totalAttendance) * 100).toFixed(2)) : 0;
 
     return res.json({ totalStudents, totalTeachers, attendancePercent });
   } catch (error) {

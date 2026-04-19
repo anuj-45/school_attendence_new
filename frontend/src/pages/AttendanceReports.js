@@ -103,6 +103,9 @@ const AttendanceReports = () => {
     const absent = filteredRecords.filter((r) => r.status === "Absent").length;
     const late = filteredRecords.filter((r) => r.status === "Late").length;
 
+    // Late students are counted as present for pie chart
+    const presentAndLate = present + late;
+
     const percent = (value) => (total > 0 ? Number(((value / total) * 100).toFixed(1)) : 0);
 
     return {
@@ -110,7 +113,8 @@ const AttendanceReports = () => {
       present,
       absent,
       late,
-      presentPct: percent(present),
+      presentAndLate,
+      presentPct: percent(presentAndLate),
       absentPct: percent(absent),
       latePct: percent(late),
     };
@@ -119,8 +123,7 @@ const AttendanceReports = () => {
   const pieStyle = {
     background: `conic-gradient(
       #22c55e 0% ${stats.presentPct}%,
-      #ef4444 ${stats.presentPct}% ${stats.presentPct + stats.absentPct}%,
-      #f59e0b ${stats.presentPct + stats.absentPct}% 100%
+      #ef4444 ${stats.presentPct}% 100%
     )`,
   };
 
@@ -242,9 +245,11 @@ const AttendanceReports = () => {
           <div className="pie-hole">{stats.total}</div>
         </div>
         <div className="report-legends">
-          <div><strong>Present:</strong> {stats.presentPct}%</div>
+          <div><strong>Present (Including Late):</strong> {stats.presentPct}%</div>
           <div><strong>Absent:</strong> {stats.absentPct}%</div>
-          <div><strong>Late:</strong> {stats.latePct}%</div>
+          <div style={{ marginTop: "10px", paddingTop: "10px", borderTop: "1px solid #ccc" }}>
+            <strong>Late Details:</strong> {stats.late} ({stats.latePct}%)
+          </div>
         </div>
       </div>
       {loading && <div className="panel"><p>Loading records...</p></div>}
