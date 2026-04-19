@@ -13,7 +13,7 @@ const teacherRoutes = require("./routes/teacherRoutes");
 const attendanceRoutes = require("./routes/attendanceRoutes");
 
 const app = express();
-const PORT = Number(process.env.PORT || 5000);
+const PORT = Number(process.env.PORT);
 
 const allowedOrigins = [
   process.env.CLIENT_URL,
@@ -79,7 +79,7 @@ const start = async () => {
     await ensureDefaultAdmin();
 
     app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
+      console.log(`Server running on port ${PORT}`);
     });
   } catch (error) {
     console.error("Server startup failed", error);
