@@ -80,11 +80,25 @@ a {
   background: #e2e8f0;
   color: #0f172a;
   border: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+
+.auth-mode-btn:hover:not(.active) {
+  background: #cbd5e1;
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.1);
 }
 
 .auth-mode-btn.active {
   background: var(--primary);
   color: #fff;
+}
+
+.auth-mode-btn.active:hover {
+  background: #1d4ed8;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  transform: translateY(-2px);
 }
 
 .role-switch {
@@ -98,11 +112,25 @@ a {
   background: #e2e8f0;
   color: #0f172a;
   border: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+
+.role-btn:hover:not(.active) {
+  background: #cbd5e1;
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.1);
 }
 
 .role-btn.active {
   background: var(--primary);
   color: #fff;
+}
+
+.role-btn.active:hover {
+  background: #1d4ed8;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  transform: translateY(-2px);
 }
 
 .filter-mode-row {
@@ -117,11 +145,25 @@ a {
   background: #e2e8f0;
   color: #0f172a;
   border: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+
+.filter-mode-btn:hover:not(.active) {
+  background: #cbd5e1;
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.1);
 }
 
 .filter-mode-btn.active {
   background: var(--primary);
   color: #fff;
+}
+
+.filter-mode-btn.active:hover {
+  background: #1d4ed8;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  transform: translateY(-2px);
 }
 
 label {
@@ -145,12 +187,17 @@ button {
   color: #fff;
   border: none;
   cursor: pointer;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition: all 0.2s ease;
 }
 
-button:hover {
-  opacity: 0.92;
-  transform: translateY(-1px);
+button:hover:not(:disabled) {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 button:disabled {
@@ -313,6 +360,17 @@ button:disabled {
   width: auto;
   background: #e2e8f0;
   color: #0f172a;
+  transition: all 0.2s ease;
+}
+
+.secondary-btn:hover:not(:disabled) {
+  background: #cbd5e1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
+}
+
+.secondary-btn:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .stat-card p {
@@ -370,11 +428,23 @@ button:disabled {
 .table-action-btn {
   width: auto;
   padding: 8px 12px;
+  transition: all 0.2s ease;
+}
+
+.table-action-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
 
 .table-action-btn.danger {
   background: var(--danger);
   color: #fff;
+}
+
+.table-action-btn.danger:hover:not(:disabled) {
+  background: #b91c1c;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+  transform: translateY(-2px);
 }
 
 .attendance-list {
@@ -465,11 +535,23 @@ button:disabled {
   width: auto;
   background: #e2e8f0;
   color: #0f172a;
+  transition: all 0.2s ease;
+}
+
+.status-buttons button:hover:not(.active-status):not(:disabled) {
+  background: #cbd5e1;
+  transform: scale(1.02);
 }
 
 .status-buttons .active-status {
   background: var(--primary);
   color: #fff;
+}
+
+.status-buttons .active-status:hover:not(:disabled) {
+  background: #1d4ed8;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  transform: scale(1.02);
 }
 
 .submit-btn {
