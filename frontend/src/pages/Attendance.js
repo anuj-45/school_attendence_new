@@ -13,6 +13,7 @@ const Attendance = () => {
   const [markDate, setMarkDate] = useState(new Date().toISOString().slice(0, 10));
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const toNextDay = (dateText) => {
     const d = new Date(`${dateText}T00:00:00`);
@@ -86,6 +87,8 @@ const Attendance = () => {
 
     try {
       await api.post("/teacher/mark-attendance", { records: recordsToSubmit, date: markDate });
+      setSuccessMessage("✓ Attendance submitted successfully!");
+      setTimeout(() => setSuccessMessage(""), 3000);
       setMarkDate((prev) => toNextDay(prev));
       await loadData();
     } catch (error) {
@@ -135,6 +138,7 @@ const Attendance = () => {
               </button>
             </div>
             {apiError && <div className="error-text">{apiError}</div>}
+            {successMessage && <div className="success-text">{successMessage}</div>}
             <label>Attendance Date</label>
             <input type="date" value={markDate} onChange={(event) => setMarkDate(event.target.value)} />
             {loading && <p>Loading attendance...</p>}

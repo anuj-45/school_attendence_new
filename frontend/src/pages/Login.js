@@ -171,7 +171,7 @@ const Login = () => {
           </button>
         </form>
         <footer className="login-footer">
-          <p>&copy; 2026 School Attendance Management System. Developed by <strong>Anuj Dafure</strong>. All rights reserved.</p>
+          <p>&copy; 2026 School Attendance Management System. Developed by <strong>Anuj Dafure</strong> | All rights reserved.</p>
         </footer>
       </div>
     </div>
