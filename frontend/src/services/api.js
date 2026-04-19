@@ -1,12 +1,7 @@
 import axios from "axios";
 
-const defaultApiUrl =
-  process.env.NODE_ENV === "production"
-    ? "https://schoolattendence.onrender.com/api"
-    : "http://localhost:5000/api";
-
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || defaultApiUrl,
+  baseURL: process.env.REACT_APP_API_URL || "https://schoolattendence.onrender.com/api",
 });
 
 api.interceptors.request.use((config) => {
