@@ -34,6 +34,10 @@ app.use(
 );
 app.use(express.json());
 
+app.get("/api", (req, res) => {
+  res.json({ message: "School Attendance API", version: "1.0.0" });
+});
+
 app.get("/api/health", (req, res) => {
   res.json({ message: "Server is healthy" });
 });
