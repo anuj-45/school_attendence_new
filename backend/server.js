@@ -42,35 +42,6 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: "Internal server error" });
 });
 
-const ensureSqliteColumns = async () => {
-  const [userColumns] = await sequelize.query("PRAGMA table_info(users);");
-  const userColumnNames = new Set(userColumns.map((c) => c.name));
-
-  if (!userColumnNames.has("class_grade")) {
-    await sequelize.query("ALTER TABLE users ADD COLUMN class_grade VARCHAR(50);");
-  }
-  if (!userColumnNames.has("division")) {
-    await sequelize.query("ALTER TABLE users ADD COLUMN division VARCHAR(20);");
-  }
-
-  const [studentColumns] = await sequelize.query("PRAGMA table_info(students);");
-  const studentColumnNames = new Set(studentColumns.map((c) => c.name));
-
-  if (!studentColumnNames.has("class_grade")) {
-    await sequelize.query("ALTER TABLE students ADD COLUMN class_grade VARCHAR(50);");
-  }
-  if (!studentColumnNames.has("division")) {
-    await sequelize.query("ALTER TABLE students ADD COLUMN division VARCHAR(20);");
-  }
-
-  await sequelize.query(
-    "UPDATE students SET class_grade = substr(class, 1, instr(class, '-') - 1) WHERE (class_grade IS NULL OR class_grade = '') AND instr(class, '-') > 0;"
-  );
-  await sequelize.query(
-    "UPDATE students SET division = upper(substr(class, instr(class, '-') + 1)) WHERE (division IS NULL OR division = '') AND instr(class, '-') > 0;"
-  );
-};
-
 const ensureDefaultAdmin = async () => {
   const adminEmail = process.env.ADMIN_EMAIL || "admin@school.com";
   const adminName = process.env.ADMIN_NAME || "School Admin";
@@ -92,17 +63,7 @@ const ensureDefaultAdmin = async () => {
 const start = async () => {
   try {
     await sequelize.authenticate();
-
-    const usingPostgres =
-      sequelize.getDialect() === "postgres" || Boolean(process.env.DATABASE_URL);
-
-    if (usingPostgres) {
-      await runMigrations(sequelize);
-    } else {
-      await sequelize.sync();
-      await ensureSqliteColumns();
-    }
-
+    await runMigrations(sequelize);
     await ensureDefaultAdmin();
 
     app.listen(PORT, () => {
