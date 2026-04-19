@@ -11,6 +11,7 @@ const TeacherDashboard = () => {
   const [studentForm, setStudentForm] = useState({ name: "", roll_number: "", parent_email: "" });
   const [editingStudentId, setEditingStudentId] = useState(null);
   const [apiError, setApiError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const loadStudents = async (searchText = debouncedSearch) => {
     const response = await api.get(`/teacher/students?search=${encodeURIComponent(searchText)}`);
@@ -40,6 +41,7 @@ const TeacherDashboard = () => {
   const submitStudent = async (event) => {
     event.preventDefault();
     setApiError("");
+    setSuccessMessage("");
 
     if (!studentForm.name || !studentForm.roll_number || !studentForm.parent_email) {
       setApiError("Student name, roll number and parent email are required");
@@ -49,11 +51,14 @@ const TeacherDashboard = () => {
     try {
       if (editingStudentId) {
         await api.put(`/teacher/students/${editingStudentId}`, studentForm);
+        setSuccessMessage("✓ Student updated successfully!");
         setEditingStudentId(null);
       } else {
         await api.post("/teacher/students", studentForm);
+        setSuccessMessage("✓ Student added successfully!");
       }
 
+      setTimeout(() => setSuccessMessage(""), 3000);
       setStudentForm({ name: "", roll_number: "", parent_email: "" });
       await loadStudents();
     } catch (error) {
@@ -74,6 +79,7 @@ const TeacherDashboard = () => {
     setEditingStudentId(null);
     setStudentForm({ name: "", roll_number: "", parent_email: "" });
     setApiError("");
+    setSuccessMessage("");
   };
 
   const removeStudent = async (student) => {
@@ -104,8 +110,10 @@ const TeacherDashboard = () => {
   return (
     <DashboardLayout title="Teacher Dashboard">
       <div className="panel">
-        <h3>{editingStudentId ? "Change Student Data" : "Add Student To Your Class"}</h3>
+        <h3>{editingStudentId ? "Change Student Data" : "Manage Students"}</h3>
         {apiError && <div className="error-text">{apiError}</div>}
+        {successMessage && <div className="success-text">{successMessage}</div>}
+        
         <form className="grid-form" onSubmit={submitStudent}>
           <input name="name" value={studentForm.name} onChange={onStudentFormChange} placeholder="Student Name" />
           <input name="roll_number" value={studentForm.roll_number} onChange={onStudentFormChange} placeholder="Roll Number" />
@@ -123,12 +131,19 @@ const TeacherDashboard = () => {
             </button>
           )}
         </form>
-        <div className="table-wrap" style={{ marginTop: 12 }}>
+
+        <div style={{ marginTop: 16, marginBottom: 12 }}>
+          <label>Search Students</label>
+          <SearchBar value={search} onChange={setSearch} placeholder="Search by name..." />
+        </div>
+
+        <div className="table-wrap">
           <table className="table">
             <thead>
               <tr>
                 <th>Name</th>
                 <th>Roll</th>
+                <th>Class</th>
                 <th>Parent Email</th>
                 <th>Actions</th>
               </tr>
@@ -139,6 +154,7 @@ const TeacherDashboard = () => {
                   <tr key={`teacher-student-${student.id}`}>
                     <td>{student.name}</td>
                     <td>{student.roll_number}</td>
+                    <td>{student.class_grade}-{student.division}</td>
                     <td>{student.parent_email}</td>
                     <td>
                       <div className="table-actions">
@@ -154,7 +170,7 @@ const TeacherDashboard = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="4" className="empty-cell">
+                  <td colSpan="5" className="empty-cell">
                     No students in your class
                   </td>
                 </tr>
@@ -163,26 +179,6 @@ const TeacherDashboard = () => {
           </table>
         </div>
       </div>
-      <div className="panel">
-        <SearchBar value={search} onChange={setSearch} placeholder="Search..." />
-      </div>
-      {Object.keys(studentsBySection)
-        .sort()
-        .map((sectionKey) => {
-          const rows = studentsBySection[sectionKey].map((student) => [
-            student.name,
-            student.roll_number,
-            sectionKey,
-            student.parent_email,
-          ]);
-
-          return (
-            <div className="panel" key={sectionKey}>
-              <h3>Class Section {sectionKey}</h3>
-              <Table headers={["Name", "Roll", "Class", "Parent Email"]} rows={rows} />
-            </div>
-          );
-        })}
     </DashboardLayout>
   );
 };
