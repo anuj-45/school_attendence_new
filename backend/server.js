@@ -15,9 +15,21 @@ const attendanceRoutes = require("./routes/attendanceRoutes");
 const app = express();
 const PORT = Number(process.env.PORT || 5000);
 
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  "https://schoolattendence-kappa.vercel.app",
+  "http://localhost:3000",
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
