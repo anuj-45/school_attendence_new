@@ -16,6 +16,23 @@ const router = express.Router();
 
 router.use(protect, authorize("admin"));
 
+router.get("/", (req, res) => {
+  res.json({
+    message: "Admin API",
+    availableEndpoints: [
+      "GET /stats",
+      "GET /students",
+      "GET /teachers",
+      "POST /add-student",
+      "POST /add-teacher",
+      "PUT /students/:id",
+      "PUT /teachers/:id",
+      "DELETE /students/:id",
+      "DELETE /teachers/:id"
+    ]
+  });
+});
+
 router.post("/add-student", addStudent);
 router.post("/add-teacher", addTeacher);
 router.put("/students/:id", updateStudent);
