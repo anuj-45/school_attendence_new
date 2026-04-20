@@ -7,6 +7,7 @@ import Students from "./pages/Students";
 import Teachers from "./pages/Teachers";
 import Attendance from "./pages/Attendance";
 import AttendanceReports from "./pages/AttendanceReports";
+import Reports from "./pages/Reports";
 import SendAbsentEmails from "./pages/SendAbsentEmails";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -48,6 +49,14 @@ const App = () => {
         }
       />
       <Route
+        path="/admin/reports"
+        element={
+          <ProtectedRoute roles={["admin"]}>
+            <Reports />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/admin/attendance/reports"
         element={
           <ProtectedRoute roles={["admin"]}>
@@ -69,6 +78,14 @@ const App = () => {
         element={
           <ProtectedRoute roles={["teacher"]}>
             <Attendance />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/teacher/reports"
+        element={
+          <ProtectedRoute roles={["teacher"]}>
+            <Reports />
           </ProtectedRoute>
         }
       />

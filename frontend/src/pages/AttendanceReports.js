@@ -17,11 +17,21 @@ const AttendanceReports = () => {
   const [year, setYear] = useState(params.get("year") || String(new Date().getFullYear()));
   const [records, setRecords] = useState([]);
   const [studentSearch, setStudentSearch] = useState("");
-  const [selectedStudentName, setSelectedStudentName] = useState("");
+  const [selectedStudentName, setSelectedStudentName] = useState(params.get("studentName") || "");
+  const [selectedClassGrade, setSelectedClassGrade] = useState(params.get("classGrade") || "");
+  const [selectedDivision, setSelectedDivision] = useState(params.get("division") || "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const updateUrl = (nextMode, nextDate, nextMonth, nextYear) => {
+  const updateUrl = (
+    nextMode,
+    nextDate,
+    nextMonth,
+    nextYear,
+    nextStudentName,
+    nextClassGrade,
+    nextDivision
+  ) => {
     const query = new URLSearchParams();
     query.set("mode", nextMode);
     if (nextMode === "date") {
@@ -32,6 +42,17 @@ const AttendanceReports = () => {
     }
     if (nextMode === "year") {
       query.set("year", nextYear);
+    }
+    if (nextMode === "student" && nextStudentName) {
+      query.set("studentName", nextStudentName);
+    }
+    if (nextMode === "class") {
+      if (nextClassGrade) {
+        query.set("classGrade", nextClassGrade);
+      }
+      if (nextDivision) {
+        query.set("division", nextDivision);
+      }
     }
     navigate(`${location.pathname}?${query.toString()}`, { replace: true });
   };
@@ -62,9 +83,9 @@ const AttendanceReports = () => {
   };
 
   useEffect(() => {
-    updateUrl(mode, date, month, year);
+    updateUrl(mode, date, month, year, selectedStudentName, selectedClassGrade, selectedDivision);
     loadRecords();
-  }, [mode, date, month, year]);
+  }, [mode, date, month, year, selectedStudentName, selectedClassGrade, selectedDivision]);
 
   const studentNameOptions = useMemo(() => {
     const seen = new Set();
@@ -90,12 +111,28 @@ const AttendanceReports = () => {
   }, [studentNameOptions, studentSearch]);
 
   const filteredRecords = useMemo(() => {
-    if (!selectedStudentName) {
-      return records;
+    let filtered = records;
+
+    if (mode === "student" && selectedStudentName) {
+      const selected = selectedStudentName.toLowerCase();
+      filtered = filtered.filter((record) => (record.student?.name || "").toLowerCase() === selected);
     }
-    const selected = selectedStudentName.toLowerCase();
-    return records.filter((record) => (record.student?.name || "").toLowerCase() === selected);
-  }, [records, selectedStudentName]);
+
+    if (mode === "class" && selectedClassGrade) {
+      filtered = filtered.filter((record) => {
+        const student = record.student || {};
+        if (student.class_grade !== selectedClassGrade) {
+          return false;
+        }
+        if (selectedDivision && student.division !== selectedDivision) {
+          return false;
+        }
+        return true;
+      });
+    }
+
+    return filtered;
+  }, [records, mode, selectedStudentName, selectedClassGrade, selectedDivision]);
 
   const stats = useMemo(() => {
     const total = filteredRecords.length;
@@ -137,7 +174,7 @@ const AttendanceReports = () => {
             className={`filter-mode-btn ${mode === "date" ? "active" : ""}`}
             onClick={() => setMode("date")}
           >
-            Datewise
+            Calendar / Daily
           </button>
           <button
             type="button"
@@ -152,6 +189,20 @@ const AttendanceReports = () => {
             onClick={() => setMode("year")}
           >
             Yearly
+          </button>
+          <button
+            type="button"
+            className={`filter-mode-btn ${mode === "student" ? "active" : ""}`}
+            onClick={() => setMode("student")}
+          >
+            Student-wise
+          </button>
+          <button
+            type="button"
+            className={`filter-mode-btn ${mode === "class" ? "active" : ""}`}
+            onClick={() => setMode("class")}
+          >
+            Class-wise
           </button>
         </div>
 
@@ -175,48 +226,84 @@ const AttendanceReports = () => {
         )}
       </div>
 
-      <div className="panel">
-        <label>Search Student</label>
-        <SearchBar
-          value={studentSearch}
-          onChange={(value) => {
-            setStudentSearch(value);
-            if (!value.trim()) {
-              setSelectedStudentName("");
-            }
-          }}
-          placeholder="Search student name..."
-        />
-        {nameSuggestions.length > 0 && (
-          <div className="suggestion-list">
-            {nameSuggestions.map((name) => (
-              <button
-                key={name}
-                type="button"
-                className="suggestion-item"
-                onClick={() => {
-                  setStudentSearch(name);
-                  setSelectedStudentName(name);
-                }}
-              >
-                {name}
-              </button>
-            ))}
-          </div>
-        )}
-        {selectedStudentName && (
-          <button
-            type="button"
-            className="table-action-btn"
-            onClick={() => {
-              setSelectedStudentName("");
-              setStudentSearch("");
+      {mode === "student" && (
+        <div className="panel">
+          <label>Search Student</label>
+          <SearchBar
+            value={studentSearch}
+            onChange={(value) => {
+              setStudentSearch(value);
+              if (!value.trim()) {
+                setSelectedStudentName("");
+              }
+            }}
+            placeholder="Search student name..."
+          />
+          {nameSuggestions.length > 0 && (
+            <div className="suggestion-list">
+              {nameSuggestions.map((name) => (
+                <button
+                  key={name}
+                  type="button"
+                  className="suggestion-item"
+                  onClick={() => {
+                    setStudentSearch(name);
+                    setSelectedStudentName(name);
+                  }}
+                >
+                  {name}
+                </button>
+              ))}
+            </div>
+          )}
+          {selectedStudentName && (
+            <button
+              type="button"
+              className="table-action-btn"
+              onClick={() => {
+                setSelectedStudentName("");
+                setStudentSearch("");
+              }}
+            >
+              Clear Selection
+            </button>
+          )}
+        </div>
+      )}
+
+      {mode === "class" && (
+        <div className="panel">
+          <label>Class</label>
+          <select
+            value={selectedClassGrade}
+            onChange={(event) => {
+              setSelectedClassGrade(event.target.value);
+              setSelectedDivision("");
             }}
           >
-            Clear Selection
-          </button>
-        )}
-      </div>
+            <option value="">All classes</option>
+            {classGradeOptions.map((grade) => (
+              <option key={grade} value={grade}>
+                {grade}
+              </option>
+            ))}
+          </select>
+
+          <label>Division</label>
+          <select
+            value={selectedDivision}
+            onChange={(event) => setSelectedDivision(event.target.value)}
+            disabled={!selectedClassGrade}
+          >
+            <option value="">All divisions</option>
+            {divisionOptions.map((division) => (
+              <option key={division} value={division}>
+                {division}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <div className="panel">
         <h3>Summary Figures</h3>
