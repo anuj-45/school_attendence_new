@@ -10,8 +10,8 @@ export const AuthProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : null;
   });
 
-  const login = async (email, password, role) => {
-    const response = await api.post("/auth/login", { email, password, role });
+  const login = async (email, password, role, schoolCode) => {
+    const response = await api.post("/auth/login", { email, password, role, schoolCode });
     const { token: authToken, user: authUser } = response.data;
     localStorage.setItem("token", authToken);
     localStorage.setItem("user", JSON.stringify(authUser));
@@ -20,9 +20,10 @@ export const AuthProvider = ({ children }) => {
     return authUser;
   };
 
-  const signup = async ({ schoolCode, name, email, password }) => {
+  const signup = async ({ schoolName, udiseCode, name, email, password }) => {
     const response = await api.post("/auth/signup", {
-      schoolCode,
+      schoolName,
+      udiseCode,
       name,
       email,
       password,

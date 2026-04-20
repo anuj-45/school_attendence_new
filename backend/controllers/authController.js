@@ -27,20 +27,20 @@ const buildAuthResponse = (user) => {
 
 const signup = async (req, res) => {
   try {
-    const { schoolCode, name, email, password } = req.body;
+    const { schoolName, udiseCode, name, email, password } = req.body;
 
-    if (!schoolCode || !name || !email || !password) {
-      return res.status(400).json({ message: "schoolCode, name, email and password are required" });
+    if (!schoolName || !udiseCode || !name || !email || !password) {
+      return res.status(400).json({ message: "schoolName, udiseCode, name, email and password are required" });
     }
 
-    const trimmedSchoolCode = String(schoolCode).trim();
+    const trimmedUdiseCode = String(udiseCode).trim();
     const udiseRegex = /^\d{11}$/;
-    if (!udiseRegex.test(trimmedSchoolCode)) {
+    if (!udiseRegex.test(trimmedUdiseCode)) {
       return res.status(400).json({ message: "School UDISE code must be exactly 11 digits" });
     }
 
     const expectedSchoolCode = String(process.env.SCHOOL_ADMIN_CODE || "").trim();
-    if (expectedSchoolCode && trimmedSchoolCode !== expectedSchoolCode) {
+    if (expectedSchoolCode && trimmedUdiseCode !== expectedSchoolCode) {
       return res.status(403).json({ message: "Invalid school code" });
     }
 
@@ -59,6 +59,8 @@ const signup = async (req, res) => {
       email,
       password: hash,
       role: "admin",
+      school_name: schoolName,
+      udise_code: trimmedUdiseCode,
     });
 
     return res.status(201).json(buildAuthResponse(user));
@@ -69,10 +71,27 @@ const signup = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    const { email, password, role } = req.body;
+    const { email, password, role, schoolCode } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password are required" });
+    }
+
+    if (role === "teacher" && !schoolCode) {
+      return res.status(400).json({ message: "School UDISE code is required for teachers" });
+    }
+
+    if (role === "teacher") {
+      const trimmedSchoolCode = String(schoolCode).trim();
+      const udiseRegex = /^\d{11}$/;
+      if (!udiseRegex.test(trimmedSchoolCode)) {
+        return res.status(400).json({ message: "School UDISE code must be exactly 11 digits" });
+      }
+
+      const expectedSchoolCode = String(process.env.SCHOOL_ADMIN_CODE || "").trim();
+      if (expectedSchoolCode && trimmedSchoolCode !== expectedSchoolCode) {
+        return res.status(403).json({ message: "Invalid school code" });
+      }
     }
 
     const user = await User.findOne({ where: { email } });

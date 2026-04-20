@@ -9,6 +9,7 @@ const baseMigrationOrder = [
   "add_gender_column.sql",
   "add_class_grade_division.sql",
   "add_messaging.sql",
+  "add_school_name.sql",
 ];
 
 const optionalMigrations = [

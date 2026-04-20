@@ -7,12 +7,14 @@ const Login = () => {
   const { login, signup } = useAuth();
   const [mode, setMode] = useState("signin");
   const [form, setForm] = useState({
-    schoolCode: "",
+    schoolName: "",
+    udiseCode: "",
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
     signInRole: "admin",
+    schoolCode: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -30,8 +32,8 @@ const Login = () => {
 
       let user;
       if (mode === "signup") {
-        if (!form.schoolCode || !form.name || !form.email || !form.password || !form.confirmPassword) {
-          setError("School code, admin name, email and password are required");
+        if (!form.schoolName || !form.udiseCode || !form.name || !form.email || !form.password || !form.confirmPassword) {
+          setError("School name, UDISE code, admin name, email and password are required");
           return;
         }
         if (form.password !== form.confirmPassword) {
@@ -39,7 +41,8 @@ const Login = () => {
           return;
         }
         user = await signup({
-          schoolCode: form.schoolCode,
+          schoolName: form.schoolName,
+          udiseCode: form.udiseCode,
           name: form.name,
           email: form.email,
           password: form.password,
@@ -49,7 +52,11 @@ const Login = () => {
           setError("Email and password are required");
           return;
         }
-        user = await login(form.email, form.password, form.signInRole);
+        if (form.signInRole === "teacher" && !form.schoolCode) {
+          setError("School UDISE code is required for teachers");
+          return;
+        }
+        user = await login(form.email, form.password, form.signInRole, form.schoolCode);
       }
 
       if (user.role === "admin") {
@@ -121,11 +128,19 @@ const Login = () => {
 
           {mode === "signup" && (
             <>
-              <label>School Code</label>
+              <label>School Name</label>
               <input
                 type="text"
-                name="schoolCode"
-                value={form.schoolCode}
+                name="schoolName"
+                value={form.schoolName}
+                onChange={onChange}
+                placeholder="Enter school name"
+              />
+              <label>School UDISE Code</label>
+              <input
+                type="text"
+                name="udiseCode"
+                value={form.udiseCode}
                 onChange={onChange}
                 placeholder="Enter 11-digit UDISE code"
                 inputMode="numeric"
@@ -145,6 +160,21 @@ const Login = () => {
 
           <label>Email</label>
           <input type="email" name="email" value={form.email} onChange={onChange} placeholder="admin@school.com" />
+          {mode === "signin" && form.signInRole === "teacher" && (
+            <>
+              <label>School UDISE Code</label>
+              <input
+                type="text"
+                name="schoolCode"
+                value={form.schoolCode}
+                onChange={onChange}
+                placeholder="Enter 11-digit UDISE code"
+                inputMode="numeric"
+                pattern="[0-9]{11}"
+                maxLength={11}
+              />
+            </>
+          )}
           <label>Password</label>
           <input type="password" name="password" value={form.password} onChange={onChange} placeholder="Enter password" />
           {mode === "signup" && (

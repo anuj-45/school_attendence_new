@@ -30,6 +30,14 @@ const User = sequelize.define(
       allowNull: false,
       defaultValue: "teacher",
     },
+    school_name: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    udise_code: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     class_grade: {
       type: DataTypes.STRING,
       allowNull: true,
