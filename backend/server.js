@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 
 const sequelize = require("./config/db");
 const { runMigrations } = require("./config/runMigrations");
+const { startOtpCleanup } = require("./controllers/otpCleanup");
 const { User } = require("./models");
 
 const authRoutes = require("./routes/authRoutes");
@@ -79,6 +80,8 @@ const start = async () => {
   try {
     await sequelize.authenticate();
     await runMigrations(sequelize);
+    // start OTP cleanup job
+    try { startOtpCleanup(sequelize); } catch (e) { /* ignore */ }
     await ensureDefaultAdmin();
 
     app.listen(PORT, () => {
