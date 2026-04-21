@@ -6,6 +6,7 @@ const baseMigrationOrder = [
   "migration.sql",
   "add_admission_no.sql",
   "add_email_settings.sql",
+  "add_student_school.sql",
   "add_email_verification.sql",
   "add_gender_column.sql",
   "add_class_grade_division.sql",

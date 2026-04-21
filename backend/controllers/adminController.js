@@ -5,6 +5,23 @@ const { User, Student, Attendance } = require("../models");
 const normalizeSearch = (search = "") => search.trim().toLowerCase();
 const buildClassSection = (classGrade, division) => `${String(classGrade).trim()}-${String(division).trim().toUpperCase()}`;
 
+const getCurrentUser = async (req) => {
+  if (!req.user || !req.user.id) return null;
+  return await User.findByPk(req.user.id);
+};
+
+const isSuperAdminUser = (user) => {
+  if (!user) return false;
+  const superAdminEmail = String(process.env.ADMIN_EMAIL || "").trim().toLowerCase();
+  const fallbackEmail = "anujdafure@owner.in";
+  const superAdminCode = String(process.env.SCHOOL_ADMIN_CODE || "").trim();
+  const fallbackCode = "11111111111";
+  return (
+    (superAdminEmail && String(user.email).toLowerCase() === superAdminEmail && String(user.udise_code) === superAdminCode) ||
+    (String(user.email).toLowerCase() === fallbackEmail && String(user.udise_code) === fallbackCode)
+  );
+};
+
 const addTeacher = async (req, res) => {
   try {
     const { name, email, password, class_grade, division } = req.body;
@@ -19,6 +36,8 @@ const addTeacher = async (req, res) => {
     }
 
     const hash = await bcrypt.hash(password, 10);
+    const current = await getCurrentUser(req);
+    const udise = current?.udise_code || null;
     const teacher = await User.create({
       name,
       email,
@@ -26,6 +45,7 @@ const addTeacher = async (req, res) => {
       role: "teacher",
       class_grade: String(class_grade).trim(),
       division: String(division).trim().toUpperCase(),
+      udise_code: udise,
     });
 
     
@@ -68,6 +88,9 @@ const addStudent = async (req, res) => {
 
     const assignedTeacherId = matchingTeachers[0].id;
 
+    const current = await getCurrentUser(req);
+    const schoolUdise = current?.udise_code || null;
+
     const student = await Student.create({
       name,
       roll_number,
@@ -76,6 +99,7 @@ const addStudent = async (req, res) => {
       division: String(division).trim().toUpperCase(),
       parent_email,
       teacher_id: assignedTeacherId,
+      school_udise: schoolUdise,
     });
 
     return res.status(201).json({ message: "Student created", student });
@@ -133,6 +157,7 @@ const updateStudent = async (req, res) => {
     student.class_grade = String(class_grade).trim();
     student.division = String(division).trim().toUpperCase();
     student.teacher_id = matchingTeachers[0].id;
+    // keep student's school_udise as-is; do not allow cross-school update here
     await student.save();
 
     return res.json({ message: "Student updated", student });
@@ -162,7 +187,11 @@ const removeStudent = async (req, res) => {
 const getTeachers = async (req, res) => {
   try {
     const search = normalizeSearch(req.query.search);
+    const current = await getCurrentUser(req);
     const whereClause = { role: "teacher" };
+    if (current && !isSuperAdminUser(current)) {
+      whereClause.udise_code = current.udise_code;
+    }
 
     if (search) {
       whereClause[Op.and] = [
@@ -192,7 +221,12 @@ const getTeachers = async (req, res) => {
 const getStudents = async (req, res) => {
   try {
     const search = normalizeSearch(req.query.search);
+    const current = await getCurrentUser(req);
     const whereClause = {};
+
+    if (current && !isSuperAdminUser(current)) {
+      whereClause.school_udise = current.udise_code;
+    }
 
     if (search) {
       whereClause[Op.or] = [
@@ -224,10 +258,18 @@ const getStudents = async (req, res) => {
 
 const getAdminStats = async (req, res) => {
   try {
+    const current = await getCurrentUser(req);
+    const statsWhere = {};
+    const teacherWhere = { role: "teacher" };
+    if (current && !isSuperAdminUser(current)) {
+      statsWhere.school_udise = current.udise_code;
+      teacherWhere.udise_code = current.udise_code;
+    }
+
     const [totalStudents, totalTeachers, totalAttendance, presentCount, lateCount] = await Promise.all([
-      Student.count(),
-      User.count({ where: { role: "teacher" } }),
-      Attendance.count(),
+      Student.count({ where: statsWhere }),
+      User.count({ where: teacherWhere }),
+      Attendance.count({ where: {} }),
       Attendance.count({ where: { status: "Present" } }),
       Attendance.count({ where: { status: "Late" } }),
     ]);
