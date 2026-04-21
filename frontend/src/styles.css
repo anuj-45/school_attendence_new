@@ -168,7 +168,7 @@ a {
 
 label {
   display: block;
-  margin: 12px 0 6px;
+  margin: 14px 0 8px;
   font-weight: 600;
 }
 
@@ -176,10 +176,10 @@ input,
 select,
 button {
   width: 100%;
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid var(--border);
-  padding: 10px 12px;
-  font-size: 14px;
+  padding: 12px 14px;
+  font-size: 15px;
 }
 
 button {
@@ -187,7 +187,10 @@ button {
   color: #fff;
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.18s ease;
+  padding: 12px 16px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
 }
 
 button:hover:not(:disabled) {
@@ -217,17 +220,17 @@ button:disabled {
 
 .app-shell {
   display: grid;
-  grid-template-columns: 260px 1fr;
+  grid-template-columns: 280px 1fr;
   min-height: 100vh;
 }
 
 .sidebar {
   background: #0f172a;
   color: #fff;
-  padding: 22px 16px;
+  padding: 28px 18px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
 
 .brand {
@@ -239,12 +242,12 @@ button:disabled {
 .side-link {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   color: #cbd5e1;
-  padding: 10px;
-  border-radius: 8px;
-  margin-bottom: 8px;
-  transition: background 0.2s ease;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  transition: background 0.18s ease;
 }
 
 .side-link:hover,
@@ -261,7 +264,7 @@ button:disabled {
 }
 
 .content {
-  padding: 20px;
+  padding: 28px;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -295,11 +298,11 @@ button:disabled {
   border: 1px solid var(--border);
   border-radius: 12px;
   box-shadow: var(--shadow);
-  padding: 16px 20px;
+  padding: 18px 22px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 
 .navbar h1 {
@@ -396,6 +399,39 @@ button:disabled {
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
   overflow: auto;
+}
+
+/* Comfortable table spacing */
+table.table th,
+table.table td,
+table th,
+table td {
+  padding: 12px 14px !important;
+}
+
+/* Class list comfortable pills */
+.class-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: linear-gradient(90deg,#f3f7ff,#ffffff);
+  color: #05264a;
+  border: 1px solid rgba(5,38,74,0.06);
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.class-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(9,30,66,0.06);
+}
+
+.class-item .teacher {
+  font-size: 13px;
+  color: #6b7280;
 }
 
 .table {

@@ -190,7 +190,7 @@ const Login = () => {
             </>
           )}
           {error && <div className="error-text">{error}</div>}
-          <button type="submit" disabled={loading}>
+          <button type="submit" disabled={loading} style={{ marginTop: 12 }}>
             {loading
               ? mode === "signup"
                 ? "Creating account..."
