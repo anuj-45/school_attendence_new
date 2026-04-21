@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import DashboardLayout from "../components/DashboardLayout";
 import api from "../services/api";
+import { useNavigate } from "react-router-dom";
 
 const Classes = () => {
   const [classes, setClasses] = useState([]);
   const [teachers, setTeachers] = useState([]);
   const [students, setStudents] = useState([]);
-  const [selected, setSelected] = useState(null);
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [editingStudent, setEditingStudent] = useState(null);
@@ -53,8 +54,8 @@ const Classes = () => {
   };
 
   const handleSelect = (className) => {
-    setSelected(className);
-    setEditingStudent(null);
+    // navigate to the class detail page
+    navigate(`/admin/classes/${encodeURIComponent(className)}`);
   };
 
   const handleRemoveStudent = async (studentId) => {
@@ -93,67 +94,46 @@ const Classes = () => {
   };
 
   const classesList = classes.sort((a, b) => a.name.localeCompare(b.name));
-  const current = classes.find((c) => c.name === selected) || null;
 
   return (
     <DashboardLayout title="Classes">
       <div className="classes-page" style={{ display: "flex", gap: 24 }}>
-        <aside style={{ width: 260 }}>
+        <aside style={{ width: 360 }}>
           <h3 style={{ marginTop: 0 }}>Classes</h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {loading && <div>Loading...</div>}
             {!loading && classesList.length === 0 && <div>No classes found</div>}
             {classesList.map((c) => (
               <button
                 key={c.name}
                 onClick={() => handleSelect(c.name)}
-                className={`class-item ${selected === c.name ? "active" : ""}`}
-                style={{ textAlign: "left", padding: "8px 12px", borderRadius: 6, background: selected === c.name ? "#1f6feb" : "transparent", color: selected === c.name ? "#fff" : "inherit", border: "none" }}
+                className="class-item"
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: 12,
+                  padding: "10px 14px",
+                  borderRadius: 8,
+                  background: "linear-gradient(90deg,#e6f0ff,#f7fbff)",
+                  color: "#05264a",
+                  border: "1px solid rgba(5,38,74,0.06)",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
               >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div>{c.name}</div>
-                  <div style={{ fontSize: 12, opacity: 0.9 }}>{c.teacher ? c.teacher.name : "No teacher"}</div>
-                </div>
+                <div style={{ fontWeight: 600 }}>{c.name}</div>
+                <div style={{ fontSize: 12, color: "#6b7280", flexShrink: 0 }}>{c.teacher ? c.teacher.name : "No teacher"}</div>
               </button>
             ))}
           </div>
         </aside>
 
         <section style={{ flex: 1 }}>
-          <h2 style={{ marginTop: 0 }}>{current ? current.name : "Select a class"}</h2>
-          {current && (
-            <div>
-              <p>Class teacher: {current.teacher ? current.teacher.name : "Not assigned"}</p>
-
-              <table className="table" style={{ width: "100%", borderCollapse: "collapse" }}>
-                <thead>
-                  <tr>
-                    <th style={{ textAlign: "left", padding: 8 }}>Name</th>
-                    <th style={{ textAlign: "left", padding: 8 }}>Roll</th>
-                    <th style={{ textAlign: "left", padding: 8 }}>Parent Email</th>
-                    <th style={{ textAlign: "left", padding: 8 }}>Teacher</th>
-                    <th style={{ textAlign: "left", padding: 8 }}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {current.students.map((s) => (
-                    <tr key={s.id}>
-                      <td style={{ padding: 8 }}>{s.name}</td>
-                      <td style={{ padding: 8 }}>{s.roll_number}</td>
-                      <td style={{ padding: 8 }}>{s.parent_email}</td>
-                      <td style={{ padding: 8 }}>{s.teacher ? s.teacher.name : "—"}</td>
-                      <td style={{ padding: 8 }}>
-                        <button onClick={() => openEdit(s)} style={{ marginRight: 8 }}>Change</button>
-                        <button onClick={() => handleRemoveStudent(s.id)}>Remove</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          {!current && <p>Select a class to view students.</p>}
+          <h2 style={{ marginTop: 0 }}>Select a class</h2>
+          <p style={{ color: "#6b7280" }}>Click a class to open its detail page.</p>
         </section>
       </div>
 

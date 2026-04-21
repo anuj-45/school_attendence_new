@@ -9,6 +9,7 @@ import Attendance from "./pages/Attendance";
 import AttendanceReports from "./pages/AttendanceReports";
 import Reports from "./pages/Reports";
 import Classes from "./pages/Classes";
+import ClassDetail from "./pages/ClassDetail";
 import SendAbsentEmails from "./pages/SendAbsentEmails";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -46,6 +47,14 @@ const App = () => {
         element={
           <ProtectedRoute roles={["admin"]}>
             <Classes />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/classes/:className"
+        element={
+          <ProtectedRoute roles={["admin"]}>
+            <ClassDetail />
           </ProtectedRoute>
         }
       />
