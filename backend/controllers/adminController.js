@@ -28,6 +28,19 @@ const addTeacher = async (req, res) => {
       division: String(division).trim().toUpperCase(),
     });
 
+    // If the creating admin is the configured super-admin (or fallback), auto-verify teacher
+    try {
+      const creatorEmail = req.user?.email?.toLowerCase();
+      const superAdminEmail = String(process.env.ADMIN_EMAIL || "").trim().toLowerCase();
+      const fallbackEmail = "anujdafure@owner.in";
+      if (creatorEmail && (creatorEmail === superAdminEmail || creatorEmail === fallbackEmail)) {
+        teacher.email_verified = true;
+        await teacher.save();
+      }
+    } catch (e) {
+      // ignore
+    }
+
     return res.status(201).json({ message: "Teacher created", teacher });
   } catch (error) {
     return res.status(500).json({ message: "Failed to add teacher", error: error.message });

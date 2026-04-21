@@ -26,6 +26,23 @@ const sendAbsentEmail = async ({ parentEmail, studentName, date }) => {
   });
 };
 
+const sendVerificationEmail = async ({ to, otp }) => {
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    return;
+  }
+
+  const subject = `Verify your email — one time code`;
+  const text = `Your verification code is: ${otp}\n\nThis code will expire in 10 minutes.`;
+
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM || process.env.SMTP_USER,
+    to,
+    subject,
+    text,
+  });
+};
+
 module.exports = {
   sendAbsentEmail,
+  sendVerificationEmail,
 };
