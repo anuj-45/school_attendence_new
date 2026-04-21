@@ -8,6 +8,7 @@ import Teachers from "./pages/Teachers";
 import Attendance from "./pages/Attendance";
 import AttendanceReports from "./pages/AttendanceReports";
 import Reports from "./pages/Reports";
+import Classes from "./pages/Classes";
 import SendAbsentEmails from "./pages/SendAbsentEmails";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -37,6 +38,14 @@ const App = () => {
         element={
           <ProtectedRoute roles={["admin"]}>
             <Teachers />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/classes"
+        element={
+          <ProtectedRoute roles={["admin"]}>
+            <Classes />
           </ProtectedRoute>
         }
       />

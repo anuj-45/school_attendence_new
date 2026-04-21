@@ -52,8 +52,8 @@ const Login = () => {
           setError("Email and password are required");
           return;
         }
-        if (form.signInRole === "teacher" && !form.schoolCode) {
-          setError("School UDISE code is required for teachers");
+        if ((form.signInRole === "teacher" || form.signInRole === "admin") && !form.schoolCode) {
+          setError("School UDISE code is required for sign in");
           return;
         }
         user = await login(form.email, form.password, form.signInRole, form.schoolCode);
@@ -160,7 +160,7 @@ const Login = () => {
 
           <label>Email</label>
           <input type="email" name="email" value={form.email} onChange={onChange} placeholder="admin@school.com" />
-          {mode === "signin" && form.signInRole === "teacher" && (
+          {mode === "signin" && (form.signInRole === "teacher" || form.signInRole === "admin") && (
             <>
               <label>School UDISE Code</label>
               <input
@@ -201,7 +201,8 @@ const Login = () => {
           </button>
         </form>
         <footer className="login-footer">
-          <p>&copy; 2026 School Attendance Management System. Developed by <strong>Anuj Dafure</strong> | All rights reserved.</p>
+          <p>&copy; 2026 School Attendance Management System. Developed by <strong>Anuj Dafure</strong> |
+           All rights reserved.</p>
         </footer>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Users, GraduationCap, ClipboardList, BarChart2, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, GraduationCap, ClipboardList, BarChart2, LogOut, BookOpen } from "lucide-react";
 
 const Sidebar = ({ role, onLogout }) => {
   const { pathname } = useLocation();
@@ -9,7 +9,7 @@ const Sidebar = ({ role, onLogout }) => {
     { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
     { to: "/admin/students", label: "Students", icon: GraduationCap },
     { to: "/admin/teachers", label: "Teachers", icon: Users },
-    { to: "/admin/attendance", label: "Attendance", icon: ClipboardList },
+    { to: "/admin/classes", label: "Classes", icon: BookOpen },
     { to: "/admin/reports", label: "Reports", icon: BarChart2 },
   ];
 
