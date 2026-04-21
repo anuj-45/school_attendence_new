@@ -65,6 +65,13 @@ const Login = () => {
         navigate("/teacher");
       }
     } catch (requestError) {
+      const status = requestError.response?.status;
+      const data = requestError.response?.data || {};
+      if (status === 403 && data.requiresVerification && data.email) {
+        // redirect to OTP verification
+        navigate(`/verify-otp?email=${encodeURIComponent(data.email)}`);
+        return;
+      }
       setError(requestError.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);

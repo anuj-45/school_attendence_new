@@ -44,4 +44,5 @@ const sendVerificationEmail = async ({ to, otp }) => {
 
 module.exports = {
   sendAbsentEmail,
+  sendVerificationEmail,
 };

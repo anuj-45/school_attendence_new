@@ -1,6 +1,7 @@
 const User = require("./User");
 const Student = require("./Student");
 const Attendance = require("./Attendance");
+const EmailVerification = require("./EmailVerification");
 User.hasMany(Student, { foreignKey: "teacher_id", as: "assignedStudents" });
 Student.belongsTo(User, { foreignKey: "teacher_id", as: "teacher" });
 
@@ -14,4 +15,5 @@ module.exports = {
   User,
   Student,
   Attendance,
+  EmailVerification,
 };

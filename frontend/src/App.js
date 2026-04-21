@@ -10,6 +10,7 @@ import AttendanceReports from "./pages/AttendanceReports";
 import Reports from "./pages/Reports";
 import Classes from "./pages/Classes";
 import ClassDetail from "./pages/ClassDetail";
+import VerifyOtp from "./pages/VerifyOtp";
 import SendAbsentEmails from "./pages/SendAbsentEmails";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -56,6 +57,9 @@ const App = () => {
           <ProtectedRoute roles={["admin"]}>
             <ClassDetail />
           </ProtectedRoute>
+              <Route path="/verify-otp" element={
+                <VerifyOtp />
+              } />
         }
       />
       <Route

@@ -14,7 +14,9 @@ const Navbar = ({ title, user }) => {
       </div>
       <div className="user-pill">
         <strong>{user?.name}</strong>
-        <span>{user?.role}</span>
+        {user?.role && String(user.role).toLowerCase() !== String(user.name || "").toLowerCase() && (
+          <span style={{ textTransform: "capitalize" }}>{user.role}</span>
+        )}
       </div>
     </header>
   );
