@@ -7,7 +7,6 @@ const Sidebar = ({ role, onLogout }) => {
 
   const adminLinks = [
     { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
-    { to: "/admin/students", label: "Students", icon: GraduationCap },
     { to: "/admin/teachers", label: "Teachers", icon: Users },
     { to: "/admin/classes", label: "Classes", icon: BookOpen },
     { to: "/admin/reports", label: "Reports", icon: BarChart2 },
