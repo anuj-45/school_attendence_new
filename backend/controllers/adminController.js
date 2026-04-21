@@ -22,23 +22,6 @@ const isSuperAdminUser = (user) => {
   );
 };
 
-const getCurrentUser = async (req) => {
-  if (!req.user || !req.user.id) return null;
-  return await User.findByPk(req.user.id);
-};
-
-const isSuperAdminUser = (user) => {
-  if (!user) return false;
-  const superAdminEmail = String(process.env.ADMIN_EMAIL || "").trim().toLowerCase();
-  const fallbackEmail = "anujdafure@owner.in";
-  const superAdminCode = String(process.env.SCHOOL_ADMIN_CODE || "").trim();
-  const fallbackCode = "11111111111";
-  return (
-    (superAdminEmail && String(user.email).toLowerCase() === superAdminEmail && String(user.udise_code) === superAdminCode) ||
-    (String(user.email).toLowerCase() === fallbackEmail && String(user.udise_code) === fallbackCode)
-  );
-};
-
 const addTeacher = async (req, res) => {
   try {
     const { name, email, password, class_grade, division } = req.body;
