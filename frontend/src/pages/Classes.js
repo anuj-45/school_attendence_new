@@ -45,7 +45,6 @@ const Classes = () => {
       });
 
       setClasses(classesArr);
-      if (!selected && classesArr.length) setSelected(classesArr[0].name);
     } catch (err) {
       setError(err.response?.data?.message || err.message || "Failed to load classes");
     } finally {

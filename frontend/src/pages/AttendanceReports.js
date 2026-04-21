@@ -18,6 +18,7 @@ const AttendanceReports = () => {
   const [records, setRecords] = useState([]);
   const [studentSearch, setStudentSearch] = useState("");
   const [selectedStudentName, setSelectedStudentName] = useState(params.get("studentName") || "");
+  const [studentCategory, setStudentCategory] = useState(params.get("studentCategory") || "date");
   const [selectedClassGrade, setSelectedClassGrade] = useState(params.get("classGrade") || "");
   const [selectedDivision, setSelectedDivision] = useState(params.get("division") || "");
   const [loading, setLoading] = useState(false);
@@ -30,7 +31,8 @@ const AttendanceReports = () => {
     nextYear,
     nextStudentName,
     nextClassGrade,
-    nextDivision
+    nextDivision,
+    nextStudentCategory
   ) => {
     const query = new URLSearchParams();
     query.set("mode", nextMode);
@@ -43,8 +45,12 @@ const AttendanceReports = () => {
     if (nextMode === "year") {
       query.set("year", nextYear);
     }
-    if (nextMode === "student" && nextStudentName) {
-      query.set("studentName", nextStudentName);
+    if (nextMode === "student") {
+      if (nextStudentCategory) query.set("studentCategory", nextStudentCategory);
+      if (nextStudentName) query.set("studentName", nextStudentName);
+      if (nextStudentCategory === "date") query.set("date", nextDate);
+      if (nextStudentCategory === "month") query.set("month", nextMonth);
+      if (nextStudentCategory === "year") query.set("year", nextYear);
     }
     if (nextMode === "class") {
       if (nextClassGrade) {
@@ -72,6 +78,11 @@ const AttendanceReports = () => {
       if (mode === "year") {
         requestParams.year = year;
       }
+      if (mode === "student") {
+        if (studentCategory === "date") requestParams.date = date;
+        if (studentCategory === "month") requestParams.month = month;
+        if (studentCategory === "year") requestParams.year = year;
+      }
 
       const response = await api.get("/attendance/history", { params: requestParams });
       setRecords(response.data.records || []);
@@ -83,9 +94,18 @@ const AttendanceReports = () => {
   };
 
   useEffect(() => {
-    updateUrl(mode, date, month, year, selectedStudentName, selectedClassGrade, selectedDivision);
+    updateUrl(
+      mode,
+      date,
+      month,
+      year,
+      selectedStudentName,
+      selectedClassGrade,
+      selectedDivision,
+      studentCategory
+    );
     loadRecords();
-  }, [mode, date, month, year, selectedStudentName, selectedClassGrade, selectedDivision]);
+  }, [mode, date, month, year, selectedStudentName, selectedClassGrade, selectedDivision, studentCategory]);
 
   const studentNameOptions = useMemo(() => {
     const seen = new Set();
@@ -228,6 +248,34 @@ const AttendanceReports = () => {
 
       {mode === "student" && (
         <div className="panel">
+          <label>Student Filter Type</label>
+          <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+            <button type="button" className={`filter-mode-btn ${studentCategory === "date" ? "active" : ""}`} onClick={() => setStudentCategory("date")}>Date</button>
+            <button type="button" className={`filter-mode-btn ${studentCategory === "month" ? "active" : ""}`} onClick={() => setStudentCategory("month")}>Month</button>
+            <button type="button" className={`filter-mode-btn ${studentCategory === "year" ? "active" : ""}`} onClick={() => setStudentCategory("year")}>Year</button>
+          </div>
+
+          {studentCategory === "date" && (
+            <>
+              <label>Date</label>
+              <input type="date" value={date} onChange={(event) => setDate(event.target.value)} />
+            </>
+          )}
+          {studentCategory === "month" && (
+            <>
+              <label>Month</label>
+              <input type="month" value={month} onChange={(event) => setMonth(event.target.value)} />
+            </>
+          )}
+          {studentCategory === "year" && (
+            <>
+              <label>Year</label>
+              <input type="number" min="2000" max="2100" value={year} onChange={(event) => setYear(event.target.value)} />
+            </>
+          )}
+
+          <div style={{ height: 12 }} />
+
           <label>Search Student</label>
           <SearchBar
             value={studentSearch}
