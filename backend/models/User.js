@@ -38,11 +38,7 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
-    email_verified: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
+    
     class_grade: {
       type: DataTypes.STRING,
       allowNull: true,
