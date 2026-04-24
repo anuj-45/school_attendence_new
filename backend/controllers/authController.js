@@ -37,11 +37,18 @@ const signup = async (req, res) => {
   try {
     const { schoolName, udiseCode, name, email, password } = req.body;
 
-    if (!schoolName || !udiseCode || !name || !email || !password) {
+    // Trim inputs to avoid validation failures caused by leading/trailing whitespace
+    const schoolNameTrim = String(schoolName || "").trim();
+    const udiseCodeTrim = String(udiseCode || "").trim();
+    const nameTrim = String(name || "").trim();
+    const emailTrim = String(email || "").trim().toLowerCase();
+    const passwordTrim = String(password || "");
+
+    if (!schoolNameTrim || !udiseCodeTrim || !nameTrim || !emailTrim || !passwordTrim) {
       return res.status(400).json({ message: "schoolName, udiseCode, name, email and password are required" });
     }
 
-    const trimmedUdiseCode = String(udiseCode).trim();
+    const trimmedUdiseCode = udiseCodeTrim;
     const udiseRegex = /^\d{11}$/;
     if (!udiseRegex.test(trimmedUdiseCode)) {
       return res.status(400).json({ message: "School UDISE code must be exactly 11 digits" });
@@ -52,19 +59,25 @@ const signup = async (req, res) => {
       return res.status(403).json({ message: "Invalid school code" });
     }
 
-    if (String(password).length < 6) {
+    if (String(passwordTrim).length < 6) {
       return res.status(400).json({ message: "Password must be at least 6 characters" });
     }
 
-    const existing = await User.findOne({ where: { email } });
+    // Basic email format check before letting Sequelize validate to provide a clearer error
+    const emailRegex = /^\S+@\S+\.\S+$/;
+    if (!emailRegex.test(emailTrim)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
+    const existing = await User.findOne({ where: { email: emailTrim } });
     if (existing) {
       return res.status(409).json({ message: "Email already registered" });
     }
 
     const hash = await bcrypt.hash(password, 10);
     const user = await User.create({
-      name,
-      email,
+      name: nameTrim,
+      email: emailTrim,
       password: hash,
       role: "admin",
       school_name: schoolName,
