@@ -40,13 +40,19 @@ const Login = () => {
           setError("Passwords do not match");
           return;
         }
-        user = await signup({
+        const signupResult = await signup({
           schoolName: form.schoolName,
           udiseCode: form.udiseCode,
           name: form.name,
           email: form.email,
           password: form.password,
         });
+
+        if (signupResult && signupResult.requiresVerification) {
+          navigate(`/verify-otp?email=${encodeURIComponent(signupResult.email)}`);
+          return;
+        }
+        user = signupResult;
       } else {
         if (!form.email || !form.password) {
           setError("Email and password are required");

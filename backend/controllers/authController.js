@@ -80,11 +80,36 @@ const signup = async (req, res) => {
       email: emailTrim,
       password: hash,
       role: "admin",
-      school_name: schoolName,
+      school_name: schoolNameTrim,
       udise_code: trimmedUdiseCode,
     });
 
-    return res.status(201).json(buildAuthResponse(user));
+    // After creating the account, generate and send an OTP for email verification
+    try {
+      const otp = String(Math.floor(100000 + Math.random() * 900000));
+      const otpHash = await bcrypt.hash(otp, 10);
+      const expiresAt = new Date(Date.now() + 3 * 60 * 1000); // 3 minutes
+
+      const existing = await EmailVerification.findOne({ where: { email: emailTrim } });
+      const now = new Date();
+      if (existing) {
+        existing.otp_hash = otpHash;
+        existing.expires_at = expiresAt;
+        existing.attempts = 0;
+        existing.last_sent_at = now;
+        await existing.save();
+      } else {
+        await EmailVerification.create({ email: emailTrim, otp_hash: otpHash, expires_at: expiresAt, attempts: 0, last_sent_at: now });
+      }
+
+      // best-effort email send
+      await sendVerificationEmail({ to: emailTrim, otp }).catch((e) => console.error("RENDER_AUTH_ERROR [send-otp-after-signup]:", e && (e.stack || e)));
+    } catch (e) {
+      console.error("RENDER_AUTH_ERROR [otp-generation-after-signup]:", e && (e.stack || e));
+    }
+
+    // Do not auto-login — require email verification. Client should redirect to verify page.
+    return res.status(201).json({ message: "Account created. Verification required", requiresVerification: true, email: emailTrim });
   } catch (error) {
     console.error("RENDER_AUTH_ERROR [signup]:", error && (error.stack || error));
     return res.status(500).json({ message: "Failed to sign up", error: error.message });

@@ -28,6 +28,12 @@ export const AuthProvider = ({ children }) => {
       email,
       password,
     });
+
+    // If server requires verification, return that info to the caller
+    if (response.data && response.data.requiresVerification) {
+      return { requiresVerification: true, email: response.data.email };
+    }
+
     const { token: authToken, user: authUser } = response.data;
     localStorage.setItem("token", authToken);
     localStorage.setItem("user", JSON.stringify(authUser));
