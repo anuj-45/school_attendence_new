@@ -1,4 +1,12 @@
 require("dotenv").config();
+
+// Ensure required environment variables are present to fail fast with a clear message
+const requiredEnvs = ["JWT_SECRET"];
+const missingEnvs = requiredEnvs.filter((k) => !process.env[k] || String(process.env[k]).trim() === "");
+if (missingEnvs.length) {
+  console.error("Missing required environment variables:", missingEnvs.join(", "));
+  process.exit(1);
+}
 const express = require("express");
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
@@ -54,8 +62,32 @@ app.use("/api/teacher", teacherRoutes);
 app.use("/api/attendance", attendanceRoutes);
 
 app.use((err, req, res, next) => {
-  console.error(err);
+  try {
+    const meta = { method: req.method, url: req.originalUrl, pid: process.pid };
+    console.error("RENDER_ERROR: Unhandled express error", meta, err && (err.stack || err));
+  } catch (e) {
+    console.error("RENDER_ERROR: Failed to log express error", e);
+  }
   res.status(500).json({ message: "Internal server error" });
+});
+
+// Global process-level handlers to capture crashes in hosted environments and surface clear logs
+process.on("unhandledRejection", (reason, promise) => {
+  try {
+    console.error("RENDER_FATAL: UnhandledRejection", { pid: process.pid, promise }, reason && (reason.stack || reason));
+  } catch (e) {
+    console.error("RENDER_FATAL: Error while logging unhandledRejection", e);
+  }
+});
+
+process.on("uncaughtException", (err) => {
+  try {
+    console.error("RENDER_FATAL: UncaughtException", { pid: process.pid }, err && (err.stack || err));
+  } catch (e) {
+    console.error("RENDER_FATAL: Error while logging uncaughtException", e);
+  }
+  // exit so the host (Render) restarts the service with clean state
+  process.exit(1);
 });
 
 const ensureDefaultAdmin = async () => {

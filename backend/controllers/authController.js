@@ -6,26 +6,31 @@ const { sendVerificationEmail } = require("../services/emailService");
 const { Op } = require("sequelize");
 
 const buildAuthResponse = (user) => {
-  const token = jwt.sign(
-    {
-      id: user.id,
-      role: user.role,
-      name: user.name,
-      email: user.email,
-    },
-    process.env.JWT_SECRET,
-    { expiresIn: "1d" }
-  );
+  try {
+    const token = jwt.sign(
+      {
+        id: user.id,
+        role: user.role,
+        name: user.name,
+        email: user.email,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
 
-  return {
-    token,
-    user: {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-    },
-  };
+    return {
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    };
+  } catch (err) {
+    console.error("RENDER_AUTH_ERROR [jwt-sign]:", err && (err.stack || err));
+    throw err;
+  }
 };
 
 const signup = async (req, res) => {
@@ -68,6 +73,7 @@ const signup = async (req, res) => {
 
     return res.status(201).json(buildAuthResponse(user));
   } catch (error) {
+    console.error("RENDER_AUTH_ERROR [signup]:", error && (error.stack || error));
     return res.status(500).json({ message: "Failed to sign up", error: error.message });
   }
 };
@@ -143,6 +149,7 @@ const login = async (req, res) => {
 
     return res.json(buildAuthResponse(user));
   } catch (error) {
+    console.error("RENDER_AUTH_ERROR [login]:", error && (error.stack || error));
     return res.status(500).json({ message: "Failed to login", error: error.message });
   }
 };
@@ -189,6 +196,7 @@ const sendOtp = async (req, res) => {
 
     return res.json({ message: "Verification OTP sent" });
   } catch (error) {
+    console.error("RENDER_AUTH_ERROR [sendOtp]:", error && (error.stack || error));
     return res.status(500).json({ message: "Failed to send OTP", error: error.message });
   }
 };
@@ -233,6 +241,7 @@ const verifyOtp = async (req, res) => {
 
     return res.json({ message: "Email verified" });
   } catch (error) {
+    console.error("RENDER_AUTH_ERROR [verifyOtp]:", error && (error.stack || error));
     return res.status(500).json({ message: "Failed to verify OTP", error: error.message });
   }
 };
